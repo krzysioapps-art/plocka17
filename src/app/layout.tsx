@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { DM_Serif_Display, Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
@@ -8,22 +8,34 @@ const inter = Inter({
   display: "swap",
 });
 
+const display = DM_Serif_Display({
+  subsets: ["latin", "latin-ext"],
+  weight: "400",
+  variable: "--font-display",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "Vetera — opieka weterynaryjna | Projekt demonstracyjny",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://www.plocka.waw.pl"),
+  // Keep Safari from modifying text nodes before React hydrates them.
+  formatDetection: {
+    telephone: false,
+    email: false,
+    address: false,
+  },
+  title: "Przychodnia Weterynaryjna Płocka | Warszawa Wola",
   description:
-    "Projekt koncepcyjny fikcyjnej marki weterynaryjnej. Dane i treści demonstracyjne do portfolio fullstack developera.",
+    "Przychodnia Weterynaryjna Płocka, ul. Płocka 17/U5, 01-231 Warszawa. Telefon: 22 412 54 24.",
   openGraph: {
-    title: "Vetera — projekt demonstracyjny",
+    title: "Przychodnia Weterynaryjna Płocka",
     description:
-      "Opieka weterynaryjna dla psów i kotów. Projekt koncepcyjny — fikcyjna marka i dane demonstracyjne.",
+      "Przychodnia Weterynaryjna Płocka, Warszawa Wola. ul. Płocka 17/U5.",
     locale: "pl_PL",
     type: "website",
     images: [
       {
-        url: "/assets/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Vetera — projekt demonstracyjny",
+        url: "/assets/illustrations/hero-vet.webp",
+        alt: "Przychodnia Weterynaryjna Płocka",
       },
     ],
   },
@@ -35,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pl" className={inter.variable}>
+    <html lang="pl" className={`${inter.variable} ${display.variable}`}>
       <body>{children}</body>
     </html>
   );

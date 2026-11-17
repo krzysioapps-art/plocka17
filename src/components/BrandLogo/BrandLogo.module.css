@@ -1,0 +1,15 @@
+.logo {
+  --logo-size: 52px;
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 8px;
+  color: var(--green-900);
+  font-size: var(--logo-size);
+  text-align: left;
+}
+.logo img { display: block; width: 1em; height: 1em; object-fit: contain; }
+.text { display: flex; flex-direction: column; justify-content: center; gap: .03em; height: .8em; white-space: nowrap; }
+.name { font-family: var(--font-display), Georgia, serif; font-size: .6em; font-weight: 400; line-height: 1; letter-spacing: -.035em; }
+.caption { font-family: var(--font-inter), sans-serif; font-size: .17em; font-weight: 400; line-height: 1; letter-spacing: 0; }
+@media (max-width: 820px) { .logo { --logo-size: 40px; gap: 5px; } }
