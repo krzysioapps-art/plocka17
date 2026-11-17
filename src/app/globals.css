@@ -43,7 +43,7 @@ h1, h2, h3 {
 h1 em, h2 em { color: var(--green-800); font-style: normal; }
 p { text-wrap: pretty; }
 .container { width: var(--page-width); margin-inline: auto; }
-main section[id] { scroll-margin-top: calc(var(--header-height) + 16px); }
+main section[id] { scroll-margin-top: var(--header-height); }
 .section { padding-block: var(--section-space); }
 .section-title {
   max-width: var(--heading-width);
