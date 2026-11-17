@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 import { ChevronDown, Star } from "lucide-react";
 
@@ -72,14 +72,97 @@ const values = [
   },
 ];
 
-// Replace these placeholders with the final reviews before publication.
-const reviews = ["Anna", "Marek", "Kasia", "Piotr", "Natalia"].map(name => ({
-  name,
-  text: "Treść opinii do uzupełnienia.",
-}));
+
+const reviews = [
+  {
+    name: "Olga",
+    rating: 5,
+    text: "To miejsce gdzie moje koty są naprawdę LECZONE. Dr Agnieszka Chełmińska-Walerzak kilkukrotnie już postawiła trafne diagnozy (gdy inni lekarze nie wiedzieli, bądź typowali błędnie), wdrażając natychmiast prawidłowe leczenie, czym uratowała mi kilkukrotnie baaaardzo chore zwierzaki.. Mam do lecznicy kilkadziesiąt kilometrów, ostatnio jeżdżę co kilka dni - ale mój kot żyje. Dzięki doktor. Nie ma słów by właściwie podziękować i wyrazić wdzięczność 💗 Adrianek, Misio, Borys - żyją dzięki Pani."
+  },
+  {
+    name: "Patryk",
+    rating: 5,
+    text: "Widać że profesjonalne podejście po pierwszej wizycie, pomimo zamknięcia o 20:00 zostałem przyjęty w nagłej sytuacji z kotką ❤️"
+  },
+  {
+    name: "Fred Bebel",
+    rating: 5,
+    text: "Bardzo profesjonalna obsługa, doskonała jakość usług bez konieczności umawiania się, gorąco polecam ❤️"
+  },
+  {
+    name: "Katarzyna Tymko",
+    rating: 5,
+    text: "Nie rozumiem tych uszczypliwych komentarzy. Nigdy, ale to nigdy nie spotkaliśmy się z jakąkolwiek nieuprzejmością ze strony personelu lecznicy. Wręcz przeciwnie, zawsze miło i fachowo. Wszystkie panie są przesympatyczne, a pani Agnieszka to lekarz z powołania."
+  },
+  {
+    name: "Kasia Brejtfus",
+    rating: 5,
+    text: "Wspaniałe miejsce ,trafiłam do Doktor Agnieszki , która kocha zwierzaki i pomogła mi z moim yorkiem , fachowa pomoc-wspaniały diagnostyk , wspaniałe serce do zwierzaka i człowieka ❤️👆.Mam cudne miejsce gdzie Doktor i przemiły zespół pomoże ❤️Polecam ,tam kochają ...i co najważniejsze leczą 🐶🐱🐰100-⭐⭐⭐⭐..."
+  },
+  {
+    name: "Wanda Charszla",
+    rating: 5,
+    text: "Opieka i empatia zespołu weterynarii w tej lecznicy"
+  },
+  {
+    name: "Mateusz Kamiński",
+    rating: 5,
+    text: "Opieka i usługi na najwyższym poziomie bez zdzierania kasy :)"
+  },
+  {
+    name: "Paweł",
+    rating: 5,
+    text: "Pani Agnieszka jest lekarzem z powołania. Fakt, że czasem trzeba poczekać, że jest kolejka ale tu jest fachowa pomoc, Pani Agnieszka również dba, by jej personel trzymał poziom. Zdecydowanie polecam, a mam porównanie z wieloma lecznicami w stolicy."
+  },
+  {
+    name: "Aleksandra Majchrzak",
+    rating: 5,
+    text: "Dr. Agnieszka-człowiek renesansu. Podziwiam, szanuję i dziękuję. Wspaniały lekarz i Człowiek, doskonały profesjonalista. Polecam"
+  }
+];
+
 
 function Stars() {
   return <span className="stars" aria-label="5 gwiazdek">{Array.from({ length: 5 }, (_, index) => <Star key={index} size={11} fill="currentColor" strokeWidth={1.5} />)}</span>;
+}
+
+function ReviewCard({ review }: { review: (typeof reviews)[number] }) {
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const textId = useId();
+  const [expanded, setExpanded] = useState(false);
+  const [canExpand, setCanExpand] = useState(false);
+
+  useEffect(() => {
+    const text = textRef.current;
+    if (!text) return;
+    let active = true;
+    const measure = () => {
+      if (!active) return;
+      const lineHeight = Number.parseFloat(getComputedStyle(text).lineHeight);
+      setCanExpand(text.scrollHeight > lineHeight * 2 + 1);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(text);
+    document.fonts.ready.then(measure);
+    return () => { active = false; observer.disconnect(); };
+  }, [review.text]);
+
+  return (
+    <article className="review">
+      <div className="review-header">
+        <span className="review-avatar">{review.name[0]}</span>
+        <div><span className="review-name">{review.name}</span><span className="review-source">Opinia z Google</span></div>
+        <Stars />
+      </div>
+      <p ref={textRef} id={textId} className={expanded ? undefined : "review-excerpt"}><PolishText>{review.text}</PolishText></p>
+      {canExpand && (
+        <button type="button" className="text-link review-toggle" aria-expanded={expanded} aria-controls={textId} onClick={() => setExpanded(value => !value)}>
+          {expanded ? "Mniej" : "Więcej"}
+        </button>
+      )}
+    </article>
+  );
 }
 
 function Reviews() {
@@ -113,14 +196,7 @@ function Reviews() {
         <div className="review-grid" ref={gridRef} tabIndex={0} role="region" aria-label="Opinie opiekunów">
           {reviews.map((review, index) => (
             <Reveal key={review.name} delay={index * 70}>
-              <article className="review">
-                <div className="review-header">
-                  <span className="review-avatar">{review.name[0]}</span>
-                  <div><span className="review-name">{review.name}</span><span className="review-source">Do uzupełnienia</span></div>
-                  <Stars />
-                </div>
-                <p><PolishText>{review.text}</PolishText></p>
-              </article>
+              <ReviewCard review={review} />
             </Reveal>
           ))}
         </div>
@@ -230,19 +306,32 @@ export default function Home() {
     return () => cancelAnimationFrame(frame);
   }, []);
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-painted");
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0, rootMargin: "40px 0px" });
+    document.querySelectorAll(".painted-background").forEach(element => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <SiteHeader menuOpen={menuOpen} setMenuOpen={setMenuOpen} closeMenu={closeMenu} />
 
       <main>
-        <section className="hero" id="home">
+        <section className="hero painted-background" id="home">
           <div className="container illustrated-section illustrated-section--split">
             <Reveal className="illustrated-heading">
               <h1><PolishText>Od lat blisko Was i Waszych zwierząt.</PolishText></h1>
             </Reveal>
             <Reveal className="illustrated-image" delay={80}>
               <div className="hero-image">
-                <img src="/assets/illustrations/hero-vet.webp" alt="Weterynarka opiekująca się psem" />
+                <img src="/assets/illustrations/hero-vet.webp" srcSet="/assets/illustrations/hero-vet-800.webp 800w, /assets/illustrations/hero-vet.webp 1254w" sizes="(max-width: 820px) 100vw, 600px" width={1254} height={1254} fetchPriority="high" alt="Weterynarka opiekująca się psem" />
               </div>
             </Reveal>
             <div className="illustrated-copy hero-copy">
@@ -302,7 +391,7 @@ export default function Home() {
               <h2 className="section-title"><PolishText>Gabinet z historią. I ze znajomymi twarzami.</PolishText></h2>
             </Reveal>
             <Reveal className="illustrated-image">
-              <img src="/assets/illustrations/about-vet.webp" alt="Weterynarka podczas opieki nad zwierzęciem" />
+              <img src="/assets/illustrations/about-vet.webp" srcSet="/assets/illustrations/about-vet-800.webp 800w, /assets/illustrations/about-vet.webp 1254w" sizes="(max-width: 820px) 340px, 440px" width={1254} height={1254} alt="Weterynarka podczas opieki nad zwierzęciem" />
             </Reveal>
 
             <Reveal className="illustrated-copy prose" delay={80}>
@@ -323,7 +412,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="section" id="services">
+        <section className="section painted-background" id="services">
           <div className="container">
             <Reveal className="section-head">
               <h2 className="section-title">
@@ -348,7 +437,7 @@ export default function Home() {
               </h2>
             </Reveal>
             <Reveal className="illustrated-image" delay={80}>
-              <img src="/assets/illustrations/development-vet.webp" alt="Weterynarka podczas pracy w przychodni" />
+              <img src="/assets/illustrations/development-vet.webp" srcSet="/assets/illustrations/development-vet-800.webp 800w, /assets/illustrations/development-vet.webp 1536w" sizes="(max-width: 820px) 100vw, 600px" width={1536} height={1024} alt="Weterynarka podczas pracy w przychodni" />
             </Reveal>
             <Reveal className="illustrated-copy prose" delay={150}>
               <p>
@@ -429,7 +518,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="footer">
+      <footer className="footer painted-background">
         <div className="container footer-main">
           <div className="footer-brand">
             <BrandLogo />
